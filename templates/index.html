@@ -1,1 +1,386 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="shortcut icon" href="logo.jpg" type="image/x-icon">
+  <title>AI-Powered Chatbot System</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <style>
+    :root {
+      --primary-green: #2d5a3b;
+      --light-green: #4a7c59;
+      --dark-green: #1e3b29;
+      --cream: #f5f9f7;
+      --accent-green: #3cb371;
+      --text-dark: #1a2f1f;
+      --text-light: #ffffff;
+      --card-bg: rgba(255, 255, 255, 0.85);
+      --card-border: rgba(60, 179, 113, 0.3);
+    }
 
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      max-width: 850px;
+      margin: 0 auto;
+      padding: 20px;
+      background: url('https://wevolver-project-images.s3.us-west-1.amazonaws.com/0.l3a7h6outg8TypesofPCB.jpeg') no-repeat center center fixed;
+      background-size: cover;
+      color: var(--text-dark);
+      position: relative;
+      min-height: 100vh;
+      backdrop-filter: blur(4px);
+    }
+
+    body::before {
+      content: "";
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(255, 255, 255, 0.4);
+      z-index: -1;
+    }
+
+    .logo {
+      text-align: center;
+      margin-top: 10px;
+      margin-bottom: 20px;
+    }
+
+    .logo img {
+      height: 80px;
+      width: auto;
+      border-radius: 12px;
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.25);
+      background: white;
+      padding: 8px;
+    }
+
+    h2, h3 {
+      color: var(--text-dark);
+      text-align: center;
+      text-shadow: 0 2px 6px rgba(255,255,255,0.6);
+    }
+
+    h2 { font-size: 2.2rem; margin-bottom: 10px; }
+
+    form, .glass-box, .contact-card {
+      background-color: var(--card-bg);
+      padding: 25px;
+      border-radius: 15px;
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+      margin-top: 20px;
+      border: 1px solid var(--card-border);
+      transition: all 0.3s ease;
+      backdrop-filter: blur(6px);
+    }
+
+    form:hover, .glass-box:hover, .contact-card:hover { 
+      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.25); 
+      transform: translateY(-4px); 
+    }
+
+    input[type="text"], input[type="email"], textarea {
+      width: 100%;
+      padding: 12px 15px;
+      margin: 10px 0;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      font-size: 16px;
+      transition: all 0.3s;
+      background-color: rgba(255, 255, 255, 0.95);
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    input:focus, textarea:focus {
+      outline: none;
+      border-color: var(--accent-green);
+      box-shadow: 0 0 0 3px rgba(60, 179, 113, 0.25);
+    }
+
+    button, .btn {
+      background: transparent;
+      color: var(--accent-green);
+      border: 2px solid var(--accent-green);
+      padding: 12px 25px;
+      font-size: 16px;
+      border-radius: 10px;
+      cursor: pointer;
+      font-weight: 600;
+      transition: all 0.3s ease;
+      text-shadow: 0 0 10px rgba(60, 179, 113, 0.6);
+      box-shadow: 0 0 12px rgba(60, 179, 113, 0.3);
+      margin: 5px 0;
+    }
+
+    button:hover, .btn:hover {
+      color: #fff;
+      background: rgba(60,179,113,0.9);
+      transform: translateY(-4px);
+      box-shadow: 0 0 20px rgba(60,179,113,0.6);
+    }
+
+    #historyList, #answerBox {
+      background-color: var(--card-bg);
+      padding: 20px;
+      border-radius: 15px;
+      margin-top: 20px;
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+      white-space: pre-line;
+      border: 1px solid var(--card-border);
+      font-size: 16px;
+      transition: all 0.3s ease;
+    }
+
+    #toggleHistoryBtn {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      background: var(--accent-green);
+      color: white;
+      border: none;
+      padding: 12px 18px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: 600;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+      transition: all 0.3s;
+    }
+
+    #toggleHistoryBtn:hover {
+      background: var(--light-green);
+      transform: translateY(-2px);
+      box-shadow: 0 6px 15px rgba(0, 0, 0, 0.2);
+    }
+
+    .form-header { text-align: center; margin-bottom: 20px; color: var(--text-dark); }
+    .form-header i { font-size: 24px; margin-right: 10px; color: var(--accent-green); }
+
+    .button-group { display: flex; gap: 10px; margin-top: 15px; }
+    .button-group button { flex: 1; }
+
+    .outline-btn { background: none; border: 2px solid var(--accent-green); color: var(--accent-green); }
+    .outline-btn:hover { background: var(--accent-green); color: white; }
+    .primary-btn { background: rgba(60,179,113,0.1); }
+    .primary-btn:hover { background: rgba(60,179,113,0.9); }
+
+    ul { list-style: none; padding: 0; }
+    li { background: rgba(245, 249, 247, 0.8); margin: 10px 0; padding: 12px 15px; border-radius: 8px; white-space: pre-line; border-left: 4px solid var(--accent-green); box-shadow: 0 3px 8px rgba(0, 0, 0, 0.1); }
+
+    .loading {
+      display: inline-block;
+      width: 20px;
+      height: 20px;
+      border: 3px solid rgba(255,255,255,.3);
+      border-radius: 50%;
+      border-top-color: #fff;
+      animation: spin 1s ease-in-out infinite;
+      margin-right: 10px;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    .input-group {
+      position: relative;
+      margin-bottom: 15px;
+    }
+
+    .input-group i {
+      position: absolute;
+      left: 15px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--accent-green);
+    }
+
+    .input-group input {
+      padding-left: 45px;
+    }
+
+    .form-buttons {
+      display: flex;
+      gap: 10px;
+      margin-top: 20px;
+    }
+
+    .form-buttons button {
+      flex: 1;
+    }
+
+    @media (max-width: 768px) {
+      body { padding: 15px; }
+      h2 { font-size: 1.8rem; }
+      #toggleHistoryBtn { position: relative; top: auto; right: auto; margin-bottom: 15px; width: 100%; }
+      .button-group, .form-buttons { flex-direction: column; }
+    }
+  </style>
+</head>
+<body>
+  <div class="logo">
+    <img src="logo.jpg" alt="AI Chat Logo">
+  </div>
+
+  <h2>AI-Powered Chatbot System</h2>
+
+  <button id="toggleHistoryBtn"><i class="fas fa-history"></i> History</button>
+  <div id="historyList">No history yet.</div>
+
+  <form id="imageForm">
+    <div class="form-header">
+      <i class="fas fa-robot"></i>
+      <h3>Ask Your Question</h3>
+    </div>
+    <input type="text" name="question" placeholder="Ask a query..." required>
+    <div class="button-group">
+      <button type="submit" id="submitBtn">Submit</button>
+      <button type="button" id="downloadBtn">Download</button>
+    </div>
+  </form>
+
+  <div id="answerBox">Your answer will appear here...</div>
+
+  <!-- QUERY SECTION -->
+  <div class="glass-box contact-card">
+    <h3><i class="fas fa-question-circle"></i> Have a Query?</h3>
+    <form id="feedbackForm">
+        <div class="input-group">
+            <i class="fas fa-comment-alt"></i>
+            <input type="text" id="message" placeholder="Your message..." required>
+        </div>
+        <div class="input-group">
+            <i class="fas fa-envelope"></i>
+            <input type="email" id="email" placeholder="Your email..." required>
+        </div>
+        <div class="form-buttons">
+            <button type="reset" class="btn outline-btn">
+                <i class="fas fa-trash-alt"></i> Clear
+            </button>
+            <button type="submit" class="btn primary-btn">
+                <i class="fas fa-paper-plane"></i> Send
+            </button>
+        </div>
+    </form>
+    <div id="feedbackStatus" style="margin-top:10px; font-weight:bold;"></div>
+  </div>
+
+  <script>
+    const form = document.getElementById("imageForm");
+    const historyList = document.getElementById("historyList");
+    const answerBox = document.getElementById("answerBox");
+    const downloadBtn = document.getElementById("downloadBtn");
+    const toggleHistoryBtn = document.getElementById("toggleHistoryBtn");
+    const submitBtn = document.getElementById("submitBtn");
+
+    let history = [];
+    let currentQA = null;
+
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const formData = new FormData(form);
+      const question = formData.get("question");
+
+      submitBtn.innerHTML = '<span class="loading"></span> Processing...';
+      submitBtn.disabled = true;
+      answerBox.textContent = "Processing your query...";
+      answerBox.style.color = "var(--accent-green)";
+
+      try {
+        const res = await fetch("/ask", { method: "POST", body: formData });
+        const data = await res.json();
+
+        if (data.answer) {
+          if (currentQA) {
+            history.push(currentQA);
+            renderHistory();
+          }
+          currentQA = { q: question, a: data.answer };
+          answerBox.textContent = "Q: " + question + "\nA: " + data.answer;
+          answerBox.style.color = "var(--text-dark)";
+          form.reset();
+        } else if (data.error) {
+          alert(data.error);
+          answerBox.textContent = "Error: " + data.error;
+          answerBox.style.color = "red";
+        }
+      } catch (err) {
+        alert(err.message);
+        answerBox.textContent = "Error: " + err.message;
+        answerBox.style.color = "red";
+      } finally {
+        submitBtn.innerHTML = 'Submit';
+        submitBtn.disabled = false;
+      }
+    });
+
+    function renderHistory() {
+      if (history.length === 0) {
+        historyList.textContent = "No history yet.";
+        return;
+      }
+      historyList.innerHTML = "<ul>" + 
+        history.map(h => <li>Q: ${h.q}\nA: ${h.a}</li>).join("") + 
+        "</ul>";
+    }
+
+    downloadBtn.addEventListener("click", () => {
+      const allData = [...history];
+      if (currentQA) allData.push(currentQA);
+      
+      if (allData.length === 0) {
+        alert("No data to download.");
+        return;
+      }
+      
+      const textHistory = allData.map(h => "Q: " + h.q + "\nA: " + h.a).join("\n\n");
+      const blob = new Blob([textHistory], { type: "text/plain" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "history.txt";
+      a.click();
+      URL.revokeObjectURL(url);
+    });
+
+    toggleHistoryBtn.addEventListener("click", () => {
+      if (historyList.style.display === "none" || historyList.style.display === "") {
+        historyList.style.display = "block";
+        toggleHistoryBtn.innerHTML = '<i class="fas fa-history"></i> Hide History';
+      } else {
+        historyList.style.display = "none";
+        toggleHistoryBtn.innerHTML = '<i class="fas fa-history"></i> Show History';
+      }
+    });
+
+    // FIXED FEEDBACK FORM HANDLER
+    document.getElementById("feedbackForm").addEventListener("submit", function(e) {
+      e.preventDefault();
+
+      const message = document.getElementById("message").value.trim();
+      const email = document.getElementById("email").value.trim();
+      const status = document.getElementById("feedbackStatus");
+
+      if (!message || !email) {
+        status.textContent = "Please fill all fields.";
+        status.style.color = "red";
+        return;
+      }
+
+      const subject = "New Query from User";
+      const body = Message: ${message}%0D%0AEmail: ${email};
+      window.location.href = mailto:fataleatharv16@gmail.com?subject=${encodeURIComponent(subject)}&body=${body};
+
+      status.textContent = "Your email client has been opened. Please send your feedback!";
+      status.style.color = "green";
+      
+      // Clear form after successful submission
+      setTimeout(() => {
+        this.reset();
+        status.textContent = "";
+      }, 5000);
+    });
+
+    renderHistory();
+  </script>
+</body>
+</html>
