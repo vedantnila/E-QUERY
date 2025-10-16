@@ -4,7 +4,7 @@ import requests
 import os
 import re
 
-app = Flask(_name_)
+app = Flask(__name__)
 app.config['UPLOAD_FOLDER'] = "uploads"
 os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
 api_key = os.getenv("GROQ_API_KEY")
@@ -71,5 +71,5 @@ def ask():
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
-if _name_ == "_main_":
+if __name__ == "__main__":
     app.run(debug=True)
