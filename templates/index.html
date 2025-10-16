@@ -265,122 +265,35 @@
   </div>
 
   <script>
-    const form = document.getElementById("imageForm");
-    const historyList = document.getElementById("historyList");
-    const answerBox = document.getElementById("answerBox");
-    const downloadBtn = document.getElementById("downloadBtn");
-    const toggleHistoryBtn = document.getElementById("toggleHistoryBtn");
-    const submitBtn = document.getElementById("submitBtn");
+const askBtn = document.getElementById("askBtn");
+const userInput = document.getElementById("userInput");
+const responseDiv = document.getElementById("response");
 
-    let history = [];
-    let currentQA = null;
+askBtn.addEventListener("click", async () => {
+  const question = userInput.value.trim();
+  if (!question) return;
 
-    form.addEventListener("submit", async (e) => {
-      e.preventDefault();
-      const formData = new FormData(form);
-      const question = formData.get("question");
+  responseDiv.textContent = "⏳ Thinking...";
 
-      submitBtn.innerHTML = '<span class="loading"></span> Processing...';
-      submitBtn.disabled = true;
-      answerBox.textContent = "Processing your query...";
-      answerBox.style.color = "var(--accent-green)";
+  const formData = new FormData();
+  formData.append("question", question);
 
-      try {
-        const res = await fetch("/ask", { method: "POST", body: formData });
-        const data = await res.json();
+  try {
+    const res = await fetch("/ask", { method: "POST", body: formData });
+    const data = await res.json();
 
-        if (data.answer) {
-          if (currentQA) {
-            history.push(currentQA);
-            renderHistory();
-          }
-          currentQA = { q: question, a: data.answer };
-          answerBox.textContent = "Q: " + question + "\nA: " + data.answer;
-          answerBox.style.color = "var(--text-dark)";
-          form.reset();
-        } else if (data.error) {
-          alert(data.error);
-          answerBox.textContent = "Error: " + data.error;
-          answerBox.style.color = "red";
-        }
-      } catch (err) {
-        alert(err.message);
-        answerBox.textContent = "Error: " + err.message;
-        answerBox.style.color = "red";
-      } finally {
-        submitBtn.innerHTML = 'Submit';
-        submitBtn.disabled = false;
-      }
-    });
-
-    function renderHistory() {
-      if (history.length === 0) {
-        historyList.textContent = "No history yet.";
-        return;
-      }
-      historyList.innerHTML = "<ul>" + 
-        history.map(h => <li>Q: ${h.q}\nA: ${h.a}</li>).join("") + 
-        "</ul>";
+    if (data.answer) {
+      responseDiv.textContent = data.answer;
+    } else {
+      responseDiv.textContent = "⚠️ Error: " + (data.error || "No response from AI.");
     }
+  } catch (err) {
+    responseDiv.textContent = "❌ Network error: " + err.message;
+  }
 
-    downloadBtn.addEventListener("click", () => {
-      const allData = [...history];
-      if (currentQA) allData.push(currentQA);
-      
-      if (allData.length === 0) {
-        alert("No data to download.");
-        return;
-      }
-      
-      const textHistory = allData.map(h => "Q: " + h.q + "\nA: " + h.a).join("\n\n");
-      const blob = new Blob([textHistory], { type: "text/plain" });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = "history.txt";
-      a.click();
-      URL.revokeObjectURL(url);
-    });
+  userInput.value = "";
+});
+</script>
 
-    toggleHistoryBtn.addEventListener("click", () => {
-      if (historyList.style.display === "none" || historyList.style.display === "") {
-        historyList.style.display = "block";
-        toggleHistoryBtn.innerHTML = '<i class="fas fa-history"></i> Hide History';
-      } else {
-        historyList.style.display = "none";
-        toggleHistoryBtn.innerHTML = '<i class="fas fa-history"></i> Show History';
-      }
-    });
-
-    // FIXED FEEDBACK FORM HANDLER
-    document.getElementById("feedbackForm").addEventListener("submit", function(e) {
-      e.preventDefault();
-
-      const message = document.getElementById("message").value.trim();
-      const email = document.getElementById("email").value.trim();
-      const status = document.getElementById("feedbackStatus");
-
-      if (!message || !email) {
-        status.textContent = "Please fill all fields.";
-        status.style.color = "red";
-        return;
-      }
-
-      const subject = "New Query from User";
-      const body = Message: ${message}%0D%0AEmail: ${email};
-      window.location.href = mailto:fataleatharv16@gmail.com?subject=${encodeURIComponent(subject)}&body=${body};
-
-      status.textContent = "Your email client has been opened. Please send your feedback!";
-      status.style.color = "green";
-      
-      // Clear form after successful submission
-      setTimeout(() => {
-        this.reset();
-        status.textContent = "";
-      }, 5000);
-    });
-
-    renderHistory();
-  </script>
 </body>
 </html>
